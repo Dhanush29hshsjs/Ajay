@@ -1,0 +1,121 @@
+_schema-version: "3.1"
+ID: ElipoGroups
+description: A simple CAP project.
+version: 1.0.0
+modules:
+- name: ElipoGroups-srv
+  type: nodejs
+  path: gen/srv
+  requires:
+  - name: uaa_ElipoGroups
+  provides:
+  - name: srv-api
+    properties:
+      srv-url: ${default-url}
+  parameters:
+    buildpack: nodejs_buildpack
+  build-parameters:
+    builder: npm
+- name: ElipoGroups-destination-content
+  type: com.sap.application.content
+  requires:
+  - name: ElipoGroups-destination-service
+    parameters:
+      content-target: true
+  - name: ElipoGroups_html_repo_host
+    parameters:
+      service-key:
+        name: ElipoGroups_html_repo_host-key
+  - name: uaa_ElipoGroups
+    parameters:
+      service-key:
+        name: uaa_ElipoGroups-key
+  parameters:
+    content:
+      instance:
+        destinations:
+        - Name: ElipoGroup_ElipoGroups_html_repo_host
+          ServiceInstanceName: ElipoGroups-html5-app-host-service
+          ServiceKeyName: ElipoGroups_html_repo_host-key
+          sap.cloud.service: ElipoGroup
+        - Authentication: OAuth2UserTokenExchange
+          Name: ElipoGroup_uaa_ElipoGroups
+          ServiceInstanceName: ElipoGroups-xsuaa-service
+          ServiceKeyName: uaa_ElipoGroups-key
+          sap.cloud.service: ElipoGroup
+        existing_destinations_policy: ignore
+  build-parameters:
+    no-source: true
+- name: ElipoGroups-app-content
+  type: com.sap.application.content
+  path: .
+  requires:
+  - name: ElipoGroups_html_repo_host
+    parameters:
+      content-target: true
+  build-parameters:
+    build-result: resources
+    requires:
+    - artifacts:
+      - elipogroupapp.zip
+      name: elipogroupapp
+      target-path: resources/
+- name: elipogroupapp
+  type: html5
+  path: app/elipogroupapp
+  build-parameters:
+    build-result: dist
+    builder: custom
+    commands:
+    - npm install
+    - npm run build:cf
+    supported-platforms: []
+resources:
+- name: ElipoGroups-destination-service
+  type: org.cloudfoundry.managed-service
+  parameters:
+    config:
+      HTML5Runtime_enabled: true
+      init_data:
+        instance:
+          destinations:
+          - Authentication: NoAuthentication
+            Name: ui5
+            ProxyType: Internet
+            Type: HTTP
+            URL: https://ui5.sap.com
+          - Authentication: NoAuthentication
+            HTML5.DynamicDestination: true
+            HTML5.ForwardAuthToken: true
+            Name: ElipoGroups-srv-api
+            ProxyType: Internet
+            Type: HTTP
+            URL: ~{srv-api/srv-url}
+          existing_destinations_policy: update
+      version: 1.0.0
+    service: destination
+    service-name: ElipoGroups-destination-service
+    service-plan: lite
+  requires:
+  - name: srv-api
+- name: ElipoGroups_html_repo_host
+  type: org.cloudfoundry.managed-service
+  parameters:
+    service: html5-apps-repo
+    service-name: ElipoGroups-html5-app-host-service
+    service-plan: app-host
+- name: uaa_ElipoGroups
+  type: org.cloudfoundry.managed-service
+  parameters:
+    path: ./xs-security.json
+    service: xsuaa
+    service-name: ElipoGroups-xsuaa-service
+    service-plan: application
+parameters:
+  deploy_mode: html5-repo
+  enable-parallel-deployments: true
+build-parameters:
+  before-all:
+  - builder: custom
+    commands:
+    - npx cds build --production

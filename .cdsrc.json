@@ -1,0 +1,13 @@
+{
+    "odata": {
+        "flavor": "x4"
+      },
+      "requires": {
+        "iflow": {
+          "kind": "rest",
+          "credentials": {
+            "url": "https://elipo_backend-shy-echidna-yp.cfapps.us20.hana.ondemand.com/dev"
+          }
+        }
+    }
+}

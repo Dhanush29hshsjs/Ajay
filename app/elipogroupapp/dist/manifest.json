@@ -1,0 +1,229 @@
+{
+    "_version": "1.58.0",
+    "sap.app": {
+        "id": "elipogroupapp",
+        "type": "application",
+        "i18n": "i18n/i18n.properties",
+        "applicationVersion": {
+            "version": "0.0.1"
+        },
+        "title": "Groups",
+        "description": "{{appDescription}}",
+        "resources": "resources.json",
+        "sourceTemplate": {
+            "id": "@sap/generator-fiori:lrop",
+            "version": "1.11.4",
+            "toolsId": "5de71375-fdae-4e34-989f-553306044f24"
+        },
+        "dataSources": {
+            "mainService": {
+                "uri": "odata/v4/application/",
+                "type": "OData",
+                "settings": {
+                    "annotations": [],
+                    "localUri": "localService/metadata.xml",
+                    "odataVersion": "4.0"
+                }
+            }
+        },
+        "crossNavigation": {
+            "inbounds": {
+                "elipogroup-display": {
+                    "semanticObject": "elipogroup",
+                    "action": "display",
+                    "title": "{{flpTitle}}",
+                    "signature": {
+                        "parameters": {},
+                        "additionalParameters": "allowed"
+                    }
+                }
+            }
+        }
+    },
+    "sap.ui": {
+        "technology": "UI5",
+        "icons": {
+            "icon": "",
+            "favIcon": "",
+            "phone": "",
+            "phone@2": "",
+            "tablet": "",
+            "tablet@2": ""
+        },
+        "deviceTypes": {
+            "desktop": true,
+            "tablet": true,
+            "phone": true
+        }
+    },
+    "sap.ui5": {
+        "flexEnabled": true,
+        "dependencies": {
+            "minUI5Version": "1.120.1",
+            "libs": {
+                "sap.m": {},
+                "sap.ui.core": {},
+                "sap.ushell": {},
+                "sap.fe.templates": {},
+                "sap.f": {}
+            }
+        },
+        "contentDensities": {
+            "compact": true,
+            "cozy": true
+        },
+        "models": {
+            "i18n": {
+                "type": "sap.ui.model.resource.ResourceModel",
+                "settings": {
+                    "bundleName": "elipogroupapp.i18n.i18n"
+                }
+            },
+            "": {
+                "dataSource": "mainService",
+                "preload": true,
+                "settings": {
+                    "synchronizationMode": "None",
+                    "operationMode": "Server",
+                    "autoExpandSelect": true,
+                    "earlyRequests": true
+                }
+            },
+            "@i18n": {
+                "type": "sap.ui.model.resource.ResourceModel",
+                "uri": "i18n/i18n.properties"
+            }
+        },
+        "resources": {
+            "css": []
+        },
+        "routing": {
+            "config": {
+                "flexibleColumnLayout": {
+                    "defaultTwoColumnLayoutType": "TwoColumnsMidExpanded",
+                    "defaultThreeColumnLayoutType": "ThreeColumnsMidExpanded"
+                },
+                "routerClass": "sap.f.routing.Router"
+            },
+            "routes": [
+                {
+                    "pattern": ":?query:",
+                    "name": "GroupsList",
+                    "target": [
+                        "GroupsList"
+                    ]
+                },
+                {
+                    "pattern": "Groups({key}):?query:",
+                    "name": "GroupsObjectPage",
+                    "target": [
+                        "GroupsList",
+                        "GroupsObjectPage"
+                    ]
+                }
+            ],
+            "targets": {
+                "GroupsList": {
+                    "type": "Component",
+                    "id": "GroupsList",
+                    "name": "sap.fe.templates.ListReport",
+                    "options": {
+                        "settings": {
+                            "contextPath": "/Groups",
+                            "variantManagement": "Page",
+                            "navigation": {
+                                "Groups": {
+                                    "detail": {
+                                        "route": "GroupsObjectPage"
+                                    }
+                                }
+                            },
+                            "controlConfiguration": {
+                                "@com.sap.vocabularies.UI.v1.LineItem": {
+                                    "tableSettings": {
+                                        "enableExport": false,
+                                        "selectAll": false,
+                                        "type": "ResponsiveTable",
+                                        "personalization": {
+                                            "column": false,
+                                            "filter": false
+                                        }
+                                    },
+                                    "columns": {
+                                        "DataField::name": {
+                                            "width": "100%"
+                                        }
+                                    }
+                                }
+                            },
+                            "initialLoad": "Enabled",
+                            "hideFilterBar": true
+                        }
+                    },
+                    "controlAggregation": "beginColumnPages",
+                    "contextPattern": ""
+                },
+                "GroupsObjectPage": {
+                    "type": "Component",
+                    "id": "GroupsObjectPage",
+                    "name": "sap.fe.templates.ObjectPage",
+                    "options": {
+                        "settings": {
+                            "editableHeaderContent": false,
+                            "contextPath": "/Groups",
+                            "controlConfiguration": {
+                                "members/@com.sap.vocabularies.UI.v1.LineItem#members": {
+                                    "tableSettings": {
+                                        "enableExport": false,
+                                        "enablePaste": false,
+                                        "selectAll": false,
+                                        "type": "ResponsiveTable",
+                                        "personalization": {
+                                            "column": false,
+                                            "filter": false
+                                        },
+                                        "quickVariantSelection": {
+                                            "showCounts": false
+                                        }
+                                    },
+                                    "columns": {
+                                        "DataField::member_name": {
+                                            "width": "33%"
+                                        },
+                                        "DataField::position": {
+                                            "width": "33%"
+                                        },
+                                        "DataField::email": {
+                                            "width": "33%"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "controlAggregation": "midColumnPages",
+                    "contextPattern": "/Groups({key})"
+                }
+            }
+        },
+        "extends": {
+            "extensions": {
+                "sap.ui.controllerExtensions": {}
+            }
+        },
+        "rootView": {
+            "viewName": "sap.fe.templates.RootContainer.view.Fcl",
+            "type": "XML",
+            "async": true,
+            "id": "appRootView"
+        }
+    },
+    "sap.fiori": {
+        "registrationIds": [],
+        "archeType": "transactional"
+    },
+    "sap.cloud": {
+        "public": true,
+        "service": "ElipoGroup"
+    }
+}
